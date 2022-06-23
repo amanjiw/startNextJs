@@ -2,6 +2,10 @@ import React from "react";
 import { useRouter } from "next/router";
 
 import { getFilteredEvents } from "../../dummy-data";
+import EventList from "../../components/events/EventList";
+import ResultsTitle from "../../components/events/ResultsTitle";
+import ErrorAlert from "../../components/ui/ErrorAlert";
+import Button from "../../components/ui/Button";
 
 // ## =>
 function FilteredEventsPage() {
@@ -9,7 +13,7 @@ function FilteredEventsPage() {
   const filteredData = router.query.slug;
 
   if (!filteredData) {
-    <p className="center">loading :) </p>;
+    return <p className="center">loading :) </p>;
   }
 
   const filteredYear = Number(filteredData[0]);
@@ -23,7 +27,16 @@ function FilteredEventsPage() {
     filteredMonth < 1 ||
     filteredMonth > 12
   ) {
-    return <p>Invalide Filter</p>;
+    return (
+      <>
+        <ErrorAlert>
+          <p>Invalide Filter</p>
+        </ErrorAlert>
+        <div className="cente">
+          <Button link="/events">Show All Events</Button>
+        </div>
+      </>
+    );
   }
 
   const filteredEvents = getFilteredEvents({
@@ -32,13 +45,25 @@ function FilteredEventsPage() {
   });
 
   if (!filteredEvents || filteredEvents.length === 0) {
-    return <p>No Events Found :(</p>;
+    return (
+      <>
+        <ErrorAlert>
+          <p>No Events Found :(</p>
+        </ErrorAlert>
+        <div className="center">
+          <Button link="/events">Show All Events</Button>
+        </div>
+      </>
+    );
   }
+
+  const date = new Date(filteredYear, filteredMonth - 1);
 
   //
   return (
     <>
-      <h1>Slug page...</h1>
+      <ResultsTitle date={date} />
+      <EventList items={filteredEvents} />
     </>
   );
 }
